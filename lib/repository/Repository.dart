@@ -19,7 +19,7 @@ class Repository{
     apiResponse.forEach((element) {
       questions.add(
         Question(
-          element["uid_variation"],
+          int.parse(element["uid_variation"]),
           element["question"],
           element["credit"],
           element["image"],

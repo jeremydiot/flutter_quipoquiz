@@ -10,8 +10,8 @@ class Score{
   String toJson(){
     return jsonEncode({
       'id': id.toString(),
-      'correct' : correct,
-      'total': total
+      'correct' : correct.toString(),
+      'total': total.toString()
     });
   }
 

@@ -6,6 +6,7 @@ import 'package:sprintf/sprintf.dart';
 
 class QuizRepository{
   Future<List<dynamic>> fetchQuiz(int id) async{
+    print(quizApiHost+sprintf(selectQuizApiRoute,[id]));
     final Response response = await get(Uri.parse(quizApiHost+sprintf(selectQuizApiRoute,[id])));
 
     if(response.statusCode == 200) {
