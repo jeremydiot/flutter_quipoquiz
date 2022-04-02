@@ -7,7 +7,8 @@ class HistoryCubit extends Cubit<List<Score>>{
   HistoryCubit(this._repository): super([]);
 
   void addScore(Score score){
-    emit([...state, score]);
+
+    emit([score,...state.where((e) => e.id != score.id).toList()]);
     _repository.saveHistory(state);
   }
 

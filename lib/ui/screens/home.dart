@@ -24,12 +24,12 @@ class Home extends StatelessWidget {
 
           while(true){
             randomId = Random().nextInt(maxQuizId - minQuizId) + minQuizId;
-
             try{
               questions = await _repository.selectQuiz(randomId);
               break;
             }catch(_){}
           }
+          print(questions);
           Navigator.pushNamed(context, "/answerQuestion", arguments:AnswerQuestionArguments(randomId, questions));
         },
         child: const Icon(Icons.play_arrow_outlined, size: 50,),

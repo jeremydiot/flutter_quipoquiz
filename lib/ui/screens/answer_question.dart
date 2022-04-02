@@ -29,8 +29,8 @@ class AnswerQuestion extends StatelessWidget {
 
     int questionTabNum = -1;
     bool nextQuestion() {
-      if(questionTabNum < questions.length-1){
-        questionTabNum++;
+      questionTabNum++;
+      if(questionTabNum < questions.length){
         Provider.of<QuestionCubit>(context, listen: false).loadQuestion(questions[questionTabNum]);
       } else {
         return false;

@@ -6,9 +6,7 @@ import 'package:sprintf/sprintf.dart';
 
 class QuizRepository{
   Future<List<dynamic>> fetchQuiz(int id) async{
-    print(quizApiHost+sprintf(selectQuizApiRoute,[id]));
     final Response response = await get(Uri.parse(quizApiHost+sprintf(selectQuizApiRoute,[id])));
-
     if(response.statusCode == 200) {
       List<dynamic> questions = [];
       final Map<String, dynamic> json = jsonDecode(response.body);
@@ -24,7 +22,6 @@ class QuizRepository{
 
   Future<Map<String, dynamic>> fetchAnswer(int quizId, int questionId, bool answer) async{
     final Response response = await get(Uri.parse(quizApiHost+sprintf(answerQuestionApiRoute,[quizId, answer.toString(), questionId])));
-
     if(response.statusCode == 200) {
       Map<String, dynamic> answer = {};
       final Map<String, dynamic> json = jsonDecode(response.body);
@@ -39,9 +36,6 @@ class QuizRepository{
 
   Future<Map<String, dynamic>> fetchResult(int id) async{
     final Response response = await get(Uri.parse(quizApiHost+sprintf(resultQuizApiRoute,[id])));
-
-
-
     if(response.statusCode == 200) {
       Map<String, dynamic> result = {};
       final Map<String, dynamic> json = jsonDecode(response.body);

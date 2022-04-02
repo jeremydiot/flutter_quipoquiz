@@ -9,14 +9,15 @@ class Score{
 
   String toJson(){
     return jsonEncode({
-      'id': id.toString(),
-      'correct' : correct.toString(),
-      'total': total.toString()
+      'id': id,
+      'correct' : correct,
+      'total': total
     });
   }
 
   factory Score.fromJson(String json){
     Map<String, dynamic> map = jsonDecode(json);
+
     return Score(
         map['id'],
         map['correct'],
