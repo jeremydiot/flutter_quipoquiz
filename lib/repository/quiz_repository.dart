@@ -12,6 +12,7 @@ class QuizRepository{
     if(response.statusCode == 200) {
       List<dynamic> questions = [];
       final Map<String, dynamic> json = jsonDecode(response.body);
+      if(json["errcode"]==-1) throw("Invalid quiz");
       if(json.containsKey("questions")) {
         questions = json['questions'];
       }
@@ -21,11 +22,11 @@ class QuizRepository{
     }
   }
 
-  Future<Map<String, String>> fetchAnswer(int quizId, int questionId, bool answer) async{
+  Future<Map<String, dynamic>> fetchAnswer(int quizId, int questionId, bool answer) async{
     final Response response = await get(Uri.parse(quizApiHost+sprintf(answerQuestionApiRoute,[quizId, answer.toString(), questionId])));
 
     if(response.statusCode == 200) {
-      Map<String, String> answer = {};
+      Map<String, dynamic> answer = {};
       final Map<String, dynamic> json = jsonDecode(response.body);
       if(json.containsKey("answer")) {
         answer = json['answer'];
@@ -38,6 +39,8 @@ class QuizRepository{
 
   Future<Map<String, dynamic>> fetchResult(int id) async{
     final Response response = await get(Uri.parse(quizApiHost+sprintf(resultQuizApiRoute,[id])));
+
+
 
     if(response.statusCode == 200) {
       Map<String, dynamic> result = {};

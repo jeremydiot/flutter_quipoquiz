@@ -6,12 +6,12 @@ class HistoryCubit extends Cubit<List<Score>>{
   final Repository _repository;
   HistoryCubit(this._repository): super([]);
 
-  void addCompany(Score score){
+  void addScore(Score score){
     emit([...state, score]);
     _repository.saveHistory(state);
   }
 
-  Future<void> loadCompanies() async{
+  Future<void> loadScores() async{
     final List<Score> scores = await _repository.loadHistory();
     emit(scores);
   }

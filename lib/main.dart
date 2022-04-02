@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_mds/blocs/history_cubit.dart';
 import 'package:flutter_quiz_mds/blocs/question_cubit.dart';
-import 'package:flutter_quiz_mds/blocs/quiz_cubit.dart';
 import 'package:flutter_quiz_mds/repository/Repository.dart';
 import 'package:flutter_quiz_mds/repository/preferences_repository.dart';
 import 'package:flutter_quiz_mds/repository/quiz_repository.dart';
@@ -18,14 +17,13 @@ void main() {
   final Repository _repository = Repository(_preferencesRepository, _quizRepository);
 
   final HistoryCubit _historyCubit = HistoryCubit(_repository);
-  final QuizCubit _quizCubit = QuizCubit(_repository);
+  _historyCubit.loadScores();
   final QuestionCubit _questionCubit = QuestionCubit();
 
   runApp(
     MultiProvider(
       providers: [
         Provider<HistoryCubit>(create: (_) => _historyCubit),
-        Provider<QuizCubit>(create: (_) => _quizCubit),
         Provider<QuestionCubit>(create:(_) => _questionCubit)
       ],
       child:const MyApp(),
