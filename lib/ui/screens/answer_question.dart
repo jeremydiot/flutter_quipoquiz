@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_quiz_mds/blocs/history_cubit.dart';
+import 'package:flutter_quiz_mds/blocs/quizzes_cubit.dart';
 import 'package:flutter_quiz_mds/blocs/question_cubit.dart';
 import 'package:flutter_quiz_mds/config/constants.dart';
 import 'package:flutter_quiz_mds/models/answer_result.dart';
@@ -70,7 +70,7 @@ class AnswerQuestion extends StatelessWidget {
 
                     if(!nextQuestion()){
                       repository.finishQuiz(args.quizId).then((QuizResult quizResult) async {
-                        Provider.of<HistoryCubit>(context, listen: false).addScore(quizResult.score);
+                        Provider.of<QuizzesCubit>(context, listen: false).addScore(quizResult.score,args.quizId);
                         await Navigator.pushNamed(context, "/quizFinished", arguments:QuizFinishedArguments(quizResult));
                         Navigator.pop(context); // close modal
                         Navigator.pop(parentContext); // close current screen

@@ -1,68 +1,116 @@
-import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_quiz_mds/blocs/history_cubit.dart';
+import 'package:flutter_quiz_mds/blocs/quizzes_cubit.dart';
 import 'package:flutter_quiz_mds/config/constants.dart';
-import 'package:flutter_quiz_mds/models/question.dart';
-import 'package:flutter_quiz_mds/models/score.dart';
+import 'package:flutter_quiz_mds/models/quiz.dart';
 import 'package:flutter_quiz_mds/repository/Repository.dart';
 import 'package:flutter_quiz_mds/ui/screens/answer_question.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final Repository _repository = Repository.factory();
+    final Repository repository = Repository.factory();
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
+      appBar: AppBar(title: const Text("QuipoQuiz"),),
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          BlocBuilder<QuizzesCubit, List<Quiz>>(
+            builder: (context, quizzes) {
+              return GridView.builder(
+                cacheExtent: 10000,
+                padding: const EdgeInsets.all(10),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.5,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10
+                ),
+                itemCount: quizzes.length,
+                itemBuilder: (BuildContext context, int index){
 
-          late int randomId;
-          late List<Question> questions;
+                  final String label = quizzes[index].label;
+                  final lastScoreResult = (quizzes[index].scores.length > 0)?quizzes[index].scores.last.correct.toString()+"/"+quizzes[index].scores.last.total.toString():"";
+                  final imageUrl = apiHost+quizzes[index].imageLink;
 
-          while(true){
-            randomId = Random().nextInt(maxQuizId - minQuizId) + minQuizId;
-            try{
-              questions = await _repository.selectQuiz(randomId);
-              break;
-            }catch(_){}
-          }
-          print(questions);
-          Navigator.pushNamed(context, "/answerQuestion", arguments:AnswerQuestionArguments(randomId, questions));
-        },
-        child: const Icon(Icons.play_arrow_outlined, size: 50,),
+                  return GridTile(
+                    child: InkWell(
+                      onTap: () {
+                        FocusScope.of(context).unfocus();
+                        repository.selectQuiz(quizzes[index].id).then((questions) {
+                          Navigator.pushNamed(context, "/answerQuestion", arguments:AnswerQuestionArguments(quizzes[index].id,questions));
+                        });
+                      },
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(1),
+                            decoration: BoxDecoration(
+                              borderRadius:BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey),
+                            ),
+                            child: Center(
+                              child: Text(label,
+                                style: TextStyle(fontSize: 25),
+                                textAlign: TextAlign.center,
+                              )
+                            )
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(imageUrl,
+                              fit: BoxFit.fill,
+                              errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.error, size: 50, color: Colors.red.withOpacity(0.5))),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5.0, bottom: 5.0),
+                            child: Text(lastScoreResult,style: TextStyle(
+                              fontSize: 15,
+                              foreground: Paint()
+                                ..style = PaintingStyle.stroke
+                                ..strokeWidth = 5
+                                ..color = Colors.black,
+                                 ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5.0, bottom: 5.0),
+                            child: Text(lastScoreResult,style: TextStyle(color: Colors.white, fontSize: 15),),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              );
+            }
+          ),
+          Container(
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            margin:const EdgeInsets.all(20),
+            child: TextField(
+              autocorrect: false,
+              autofocus: false,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                prefixIcon: Icon(Icons.search),
+                labelText: "Rechercher..."
+              ),
+              onChanged: (String value){
+                Provider.of<QuizzesCubit>(context, listen: false).search(value);
+              },
+            ),
+          )
+        ],
       ),
-      appBar: AppBar(
-        title: const Text("Quiz"),
-      ),body: Column(
-          children: [
-            Expanded(child: BlocBuilder<HistoryCubit, List<Score>>(
-
-              builder: (context, scores) {
-                return ListView.separated(
-                    itemCount: scores.length,
-                    itemBuilder: (BuildContext context, int index){
-                      return ListTile(
-                        title: Text("Quiz N° "+scores[index].id.toString()),
-                        subtitle: Text("Score "+scores[index].correct.toString()+"/"+scores[index].total.toString()),
-                        leading: const Icon(Icons.help_outline, size: 50),
-                        onTap: () async {
-                          List<Question> questions = await _repository.selectQuiz(scores[index].id);
-                          Navigator.pushNamed(context, "/answerQuestion", arguments:AnswerQuestionArguments(scores[index].id, questions));
-                        },
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index){
-                      return const Divider(height: 0);
-                    },
-                );
-              }
-            )),
-          ],
-        ),
-
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_quiz_mds/config/util.dart';
 import 'package:flutter_quiz_mds/models/answer_result.dart';
 import 'package:flutter_quiz_mds/models/question.dart';
+import 'package:flutter_quiz_mds/models/quiz.dart';
 import 'package:flutter_quiz_mds/models/quiz_result.dart';
 import 'package:flutter_quiz_mds/models/score.dart';
 import 'package:flutter_quiz_mds/repository/preferences_repository.dart';
@@ -42,13 +43,13 @@ class Repository{
 
   Future<QuizResult> finishQuiz(int id) async{
     Map<String, dynamic> apiResponse = await _quizRepository.fetchResult(id);
-    Score score = Score(id,int.parse(apiResponse["correct"]), int.parse(apiResponse["total"]));
+    Score score = Score(int.parse(apiResponse["correct"]), int.parse(apiResponse["total"]));
     return QuizResult(score, apiResponse["statistics"]["new_avg"], int.parse(apiResponse["statistics"]["nb_attempt"]));
   }
 
-  Future<List<Score>> loadHistory() async => await _preferencesRepository.loadHistory();
+  Future<List<Quiz>> loadQuizzes() => _preferencesRepository.loadQuizzes();
 
-  Future<void> saveHistory(List<Score> scores) async => await _preferencesRepository.saveHistory(scores);
+  Future<void> saveQuizzes(List<Quiz> quizzes) => _preferencesRepository.saveQuizzes(quizzes);
 
   factory Repository.factory(){
     return Repository(PreferencesRepository(), QuizRepository());

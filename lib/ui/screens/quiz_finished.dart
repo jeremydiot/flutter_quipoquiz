@@ -14,7 +14,7 @@ class QuizFinished extends StatelessWidget {
     final args = ModalRoute.of(context)!.settings.arguments as QuizFinishedArguments;
     QuizResult quizResult = args.quizResult;
     return Scaffold(
-      appBar: AppBar(title: Text("Résultats quiz N° "+quizResult.score.id.toString())),
+      //appBar: AppBar(title: Text("Résultats quiz N° "+quizResult.score.id.toString())),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

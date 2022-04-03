@@ -1,27 +1,30 @@
 import 'dart:convert';
 
 class Score{
-  int id;
   int correct;
   int total;
 
-  Score(this.id, this.correct, this.total);
+  Score(this.correct, this.total);
 
   String toJson(){
     return jsonEncode({
-      'id': id,
       'correct' : correct,
       'total': total
     });
   }
 
   factory Score.fromJson(String json){
-    Map<String, dynamic> map = jsonDecode(json);
-
+    var map = jsonDecode(json);
     return Score(
-        map['id'],
         map['correct'],
         map['total']
     );
+  }
+
+  static List<Score> fromJsonList(String json){
+    var map = jsonDecode(json);
+    List<Score> scores = [];
+    map.forEach((e) => scores.add(Score(e['correct'],e['total'])));
+    return scores;
   }
 }

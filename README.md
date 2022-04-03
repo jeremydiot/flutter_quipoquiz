@@ -7,16 +7,19 @@
 - Dart: 2.16.0
 
 ### Functionalities
-- Open random quiz from API
-- Store quiz result in app
-- Show history of results
-- Reopen quiz from history list
+- Open from list
+- Search quiz
+- Store quiz result
+- Show last quiz result
 
 ### API
-- Host : https://quipoquiz.com/module/sed/quiz/fr/
-- Select quiz : /start_quiz.snc?quiz=1
-- Answer question : /answer_question.snc?quiz=1&answer=false&question=1
-- Quiz result : /end_quiz.snc?quiz=1
+- Base URL : https://quipoquiz.com/module/sed/quiz/fr
+- Select and Get quiz question : /start_quiz.snc?quiz={quiz_id}
+- Answer question : /answer_question.snc?quiz={quiz_id}&answer={true || false}&question={question_id}
+- Finish quiz and get result : /end_quiz.snc?quiz={quiz_id}
+
+### Quiz list
+- Extracted with [python_quipoquiz_scraping](https://github.com/jeremydiot/python_quipoquiz_scraping) Project.
 
 ### Screens
 - Home

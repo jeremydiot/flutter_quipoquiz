@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz_mds/blocs/history_cubit.dart';
+import 'package:flutter_quiz_mds/blocs/quizzes_cubit.dart';
 import 'package:flutter_quiz_mds/blocs/question_cubit.dart';
 import 'package:flutter_quiz_mds/repository/Repository.dart';
-import 'package:flutter_quiz_mds/repository/preferences_repository.dart';
-import 'package:flutter_quiz_mds/repository/quiz_repository.dart';
 import 'package:flutter_quiz_mds/ui/screens/quiz_finished.dart';
 import 'package:flutter_quiz_mds/ui/screens/home.dart';
 import 'package:flutter_quiz_mds/ui/screens/answer_question.dart';
@@ -12,19 +10,18 @@ import 'package:provider/provider.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final PreferencesRepository _preferencesRepository = PreferencesRepository();
-  final QuizRepository _quizRepository = QuizRepository();
-  final Repository _repository = Repository(_preferencesRepository, _quizRepository);
+  final Repository repository = Repository.factory();
 
-  final HistoryCubit _historyCubit = HistoryCubit(_repository);
-  _historyCubit.loadScores();
-  final QuestionCubit _questionCubit = QuestionCubit();
+  final QuizzesCubit quizzesCubit = QuizzesCubit(repository);
+  quizzesCubit.loadQuizzes();
+
+  final QuestionCubit questionCubit = QuestionCubit();
 
   runApp(
     MultiProvider(
       providers: [
-        Provider<HistoryCubit>(create: (_) => _historyCubit),
-        Provider<QuestionCubit>(create:(_) => _questionCubit)
+        Provider<QuizzesCubit>(create: (_) => quizzesCubit),
+        Provider<QuestionCubit>(create:(_) => questionCubit)
       ],
       child:const MyApp(),
     )
