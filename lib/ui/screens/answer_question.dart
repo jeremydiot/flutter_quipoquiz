@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quiz_mds/blocs/quizzes_cubit.dart';
@@ -5,15 +6,16 @@ import 'package:flutter_quiz_mds/blocs/question_cubit.dart';
 import 'package:flutter_quiz_mds/config/constants.dart';
 import 'package:flutter_quiz_mds/models/answer_result.dart';
 import 'package:flutter_quiz_mds/models/question.dart';
+import 'package:flutter_quiz_mds/models/quiz.dart';
 import 'package:flutter_quiz_mds/models/quiz_result.dart';
 import 'package:flutter_quiz_mds/repository/Repository.dart';
 import 'package:flutter_quiz_mds/ui/screens/quiz_finished.dart';
 import 'package:provider/provider.dart';
 
 class AnswerQuestionArguments{
-  final int quizId;
+  final Quiz quiz;
   final List<Question> questions;
-  AnswerQuestionArguments(this.quizId, this.questions);
+  AnswerQuestionArguments(this.quiz, this.questions);
 }
 
 class AnswerQuestion extends StatelessWidget {
@@ -69,8 +71,8 @@ class AnswerQuestion extends StatelessWidget {
                     onceTap = false;
 
                     if(!nextQuestion()){
-                      repository.finishQuiz(args.quizId).then((QuizResult quizResult) async {
-                        Provider.of<QuizzesCubit>(context, listen: false).addScore(quizResult.score,args.quizId);
+                      repository.finishQuiz(args.quiz.id).then((QuizResult quizResult) async {
+                        Provider.of<QuizzesCubit>(context, listen: false).addScore(quizResult.score,args.quiz.id);
                         await Navigator.pushNamed(context, "/quizFinished", arguments:QuizFinishedArguments(quizResult));
                         Navigator.pop(context); // close modal
                         Navigator.pop(parentContext); // close current screen
@@ -91,81 +93,137 @@ class AnswerQuestion extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text("Quiz N° "+args.quizId.toString()),),
+      appBar: AppBar(title:Text(args.quiz.label)),
       body: BlocBuilder <QuestionCubit, Question?>(
         builder: (context, question){
 
           if(question == null) return const Text("Error");
           bool onceTap = true;
 
-          return Center(
-            child: Column(
-              children: [
-                SizedBox(
-                    height: (MediaQuery.of(context).size.height / 2) ,
-                    width: MediaQuery.of(context).size.width,
-                    child: Image.network(
-                      apiHost+question.image,
-                      alignment: Alignment.topCenter,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (context, child, loadingProgress){
-                        if (loadingProgress == null) return child;
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                      errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.error, size: 50, color: Colors.red,)),
+          return Column(
+            children: [
+              AspectRatio(
+                aspectRatio: 1,
+                child: Container(
+                    margin: EdgeInsets.all(20),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(
+                        apiHost+question.image,
+                        alignment: Alignment.center,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress){
+                          if (loadingProgress == null) return child;
+                          return const Center(child: CircularProgressIndicator());
+                        },
+                        errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.error, size: 50, color: Colors.red,)),
+                      ),
                     )
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Text(
-                    (questionTabNum+1).toString()+"/"+questions.length.toString(),
-                    style: const TextStyle(fontSize:20),
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Stack(
+                  children: [
+                    Text(
+                      (questionTabNum+1).toString()+" / "+questions.length.toString(),
+                      style: TextStyle(
+                          fontSize:25,
+                          foreground: Paint()
+                            ..style = PaintingStyle.stroke
+                            ..strokeWidth = 5
+                            ..color = Colors.black.withOpacity(0.7),
+                      ),
+                    ),
+                    Text(
+                      (questionTabNum+1).toString()+" / "+questions.length.toString(),
+                      style: const TextStyle(fontSize:25, color:  Colors.white),
+                    ),
+                  ],
                 ),
-                Expanded(child:SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child:Text(
+              ),
+              Expanded(child:SingleChildScrollView(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
                       question.question,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize:25),
-                    ),)
-                  ),
-                ),
-                // Container(
-                //   width: MediaQuery.of(context).size.width,
-                //   padding: const EdgeInsets.all(5.0),
-                //   child: Text(
-                //     question.credit,
-                //     textAlign: TextAlign.right,
-                //   ),
-                // ),
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(onPressed: () async {
-                        if(!onceTap) return;
-                        onceTap = false;
-
-                        AnswerResult answerResult =  await repository.answerQuestion(args.quizId, question.id, true);
-                        resultModal(context, answerResult);
-                      }, child: const Text("Vrai")),
-                      ElevatedButton(onPressed: () async {
-                        if(!onceTap) return;
-                        onceTap = false;
-
-                        AnswerResult answerResult =  await repository.answerQuestion(args.quizId, question.id, false);
-                        resultModal(context, answerResult);
-                      }, child: const Text("Faux")),
-                    ],),
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize:25,
+                        height: 1.4,
+                        color: Colors.black.withOpacity(0.75)
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      question.credit,
+                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      style: const TextStyle(
+                          fontSize: 10,
+                          overflow: TextOverflow.ellipsis
+                      ),
+                    ),
+                  ],
                 )
-                // Text(currentQuestion.credit),
-                // Text(currentQuestion.image),
-                // Text(currentQuestion.id.toString()),
-              ],
-            ),
+              )),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      if(!onceTap) return;
+                        onceTap = false;
+                        //AnswerResult answerResult =  await repository.answerQuestion(args.quizId, question.id, true);
+                        //resultModal(context, answerResult);
+                      },
+                    child: Row(
+                      children: const [
+                        Text(
+                          "Vrai  ",
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Icon(Icons.thumb_up)
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(MediaQuery.of(context).size.width / 2, 80),
+                      primary: Colors.green.withOpacity(0.8),
+                      shape: ContinuousRectangleBorder()
+                    ),
+                  ),
+                  ElevatedButton(onPressed: () async {
+                    if(!onceTap) return;
+                    onceTap = false;
+
+                    //AnswerResult answerResult =  await repository.answerQuestion(args.quizId, question.id, false);
+                    //resultModal(context, answerResult);
+                  }, child: Row(
+                      children: const [
+                        Text(
+                            "Faux  ",
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold
+                            ),
+                        ),
+                        Icon(Icons.thumb_down)
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(MediaQuery.of(context).size.width / 2, 80),
+                      primary: Colors.red.withOpacity(0.8),
+                      shape: ContinuousRectangleBorder()
+                    ),
+                  )
+                ],)
+            ],
           );
         }
       )

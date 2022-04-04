@@ -6,35 +6,41 @@ import 'package:flutter_quiz_mds/models/score.dart';
 import 'package:flutter_quiz_mds/repository/Repository.dart';
 
 class QuizzesCubit extends Cubit<List<Quiz>>{
-  final Repository _repository;
-  Timer? searchTimer;
 
-  QuizzesCubit(this._repository): super([]);
+  final Repository _repository;
+
+  Timer? _searchTimer;
+
+  List<Quiz> _quizzes = [];
+  String _search = "";
+
+  QuizzesCubit(this._repository) : super([]) {
+    _repository.loadQuizzes().then((quizzes){
+      _quizzes = quizzes;
+    }).whenComplete((){
+      emit(_quizzes);
+    });
+  }
+
 
   void search(String value){
-    if(searchTimer != null){
-      searchTimer?.cancel();
+    _search = value;
+    if(_searchTimer != null){
+      _searchTimer?.cancel();
     }
 
-    if(value.isEmpty){
-      _repository.loadQuizzes().then(emit);
-    }else if(value.length > 2){
-      searchTimer = Timer(const Duration(milliseconds: 500), () async {
-        List<Quiz> quizzes = await _repository.loadQuizzes();
-        emit(quizzes.where((e) => e.label.toLowerCase().contains(value.toLowerCase())).toList());
-      });
-    }
-
+    _searchTimer = Timer(const Duration(milliseconds: 500), () async {
+      if(value.isEmpty) {
+        emit(_quizzes);
+      } else {
+        emit(_quizzes.where((e) => e.label.toLowerCase().contains(value.toLowerCase())).toList());
+      }
+    });
   }
 
   void addScore(Score score, int quizId){
-    state.firstWhere((e) => e.id==quizId).scores.add(score);
-    emit(state);
-    _repository.saveQuizzes(state);
-  }
-
-  Future<void> loadQuizzes() async{
-    List<Quiz> quizzes = await _repository.loadQuizzes();
-    emit(quizzes);
+    _quizzes.firstWhere((e) => e.id==quizId).scores.add(score);
+    search(_search);
+    _repository.saveQuizzes(_quizzes);
   }
 }

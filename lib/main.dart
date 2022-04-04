@@ -13,7 +13,6 @@ void main() {
   final Repository repository = Repository.factory();
 
   final QuizzesCubit quizzesCubit = QuizzesCubit(repository);
-  quizzesCubit.loadQuizzes();
 
   final QuestionCubit questionCubit = QuestionCubit();
 

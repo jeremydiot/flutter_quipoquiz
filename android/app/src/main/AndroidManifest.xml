@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="fr.jdiot.flutterquizmds.flutter_quiz_mds">
    <application
-        android:label="flutter_quiz_mds"
+        android:label="QuipoQuiz"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/logo">
         <activity
             android:name=".MainActivity"
             android:exported="true"

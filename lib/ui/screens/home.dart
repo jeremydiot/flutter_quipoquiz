@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quiz_mds/blocs/quizzes_cubit.dart';
 import 'package:flutter_quiz_mds/config/constants.dart';
@@ -17,12 +15,22 @@ class Home extends StatelessWidget {
     final Repository repository = Repository.factory();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("QuipoQuiz"),),
+      appBar: AppBar(
+        title: Container(
+          padding: const EdgeInsets.all(50),
+          child: const Image(
+            image: AssetImage('assets/image/banner.png')
+          )
+        )
+      ),
       body: Stack(
         alignment: Alignment.bottomCenter,
         children: [
           BlocBuilder<QuizzesCubit, List<Quiz>>(
             builder: (context, quizzes) {
+
+              bool onceTap = false;
+
               return GridView.builder(
                 cacheExtent: 10000,
                 padding: const EdgeInsets.all(10),
@@ -42,9 +50,13 @@ class Home extends StatelessWidget {
                   return GridTile(
                     child: InkWell(
                       onTap: () {
+                        if(onceTap) return;
+                        onceTap = true;
+
                         FocusScope.of(context).unfocus();
                         repository.selectQuiz(quizzes[index].id).then((questions) {
-                          Navigator.pushNamed(context, "/answerQuestion", arguments:AnswerQuestionArguments(quizzes[index].id,questions));
+                          Navigator.pushNamed(context, "/answerQuestion", arguments:AnswerQuestionArguments(quizzes[index],questions));
+                          onceTap = false;
                         });
                       },
                       child: Stack(
@@ -58,16 +70,29 @@ class Home extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(label,
-                                style: TextStyle(fontSize: 25),
+                                style: const TextStyle(fontSize: 25),
                                 textAlign: TextAlign.center,
                               )
                             )
                           ),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(imageUrl,
-                              fit: BoxFit.fill,
-                              errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.error, size: 50, color: Colors.red.withOpacity(0.5))),
+                          Container(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(imageUrl,
+                                fit: BoxFit.fill,
+                                errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.error, size: 50, color: Colors.red.withOpacity(0.5))),
+                              ),
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(3, 3), // changes position of shadow changes position of shadow
+                                ),
+                              ],
                             ),
                           ),
                           Padding(
@@ -83,7 +108,7 @@ class Home extends StatelessWidget {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 5.0, bottom: 5.0),
-                            child: Text(lastScoreResult,style: TextStyle(color: Colors.white, fontSize: 15),),
+                            child: Text(lastScoreResult,style: const TextStyle(color: Colors.white, fontSize: 15),),
                           )
                         ],
                       ),
@@ -94,7 +119,17 @@ class Home extends StatelessWidget {
             }
           ),
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.8),
+                    spreadRadius: 1,
+                    blurRadius: 6,
+                  ),
+                ],
+            ),
             margin:const EdgeInsets.all(20),
             child: TextField(
               autocorrect: false,
@@ -107,10 +142,10 @@ class Home extends StatelessWidget {
               onChanged: (String value){
                 Provider.of<QuizzesCubit>(context, listen: false).search(value);
               },
-            ),
+            )
           )
-        ],
-      ),
+        ]
+      )
     );
   }
 }
