@@ -20,11 +20,4 @@ class Score{
         map['total']
     );
   }
-
-  static List<Score> fromJsonList(String json){
-    var map = jsonDecode(json);
-    List<Score> scores = [];
-    map.forEach((e) => scores.add(Score(e['correct'],e['total'])));
-    return scores;
-  }
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_quiz_mds/models/quiz.dart';
+import 'package:flutter_quiz_mds/models/score.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesRepository{
@@ -18,7 +19,7 @@ class PreferencesRepository{
     // init prefs if it's empty
     if(quizPrefs == null){
       String quizListFile = await rootBundle.loadString('assets/json/quiz_list.json');
-      json.decode(quizListFile).forEach((e) => quizzes.add(Quiz(int.parse(e["quiz_id"]!), e["label"]!, e["image_link"]!, [])));
+      json.decode(quizListFile).forEach((e) => quizzes.add(Quiz(int.parse(e["quiz_id"]!), e["label"]!, e["image_link"]!, Score(0,0))));
       await saveQuizzes(quizzes);
       return await loadQuizzes();
     }

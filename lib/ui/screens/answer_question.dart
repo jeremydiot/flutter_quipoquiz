@@ -48,45 +48,91 @@ class AnswerQuestion extends StatelessWidget {
         barrierDismissible: false,
         context: parentContext,
         builder: (BuildContext context){
+          bool onceTap = false;
+          const double padding = 15;
+          const double radius = 30;
           return Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: Container(
-              constraints: const BoxConstraints(maxHeight: 400),
-              padding: const EdgeInsets.all(15),
-              child: Column(
+            backgroundColor: Colors.transparent,
+            child: Stack(
                 children: [
-                  SizedBox(
-                    child: answerResult.correct?const Icon(Icons.check_circle, color: Colors.green, size: 60,):const Icon(Icons.cancel, color: Colors.red, size: 60,),
-                  ),
-                  const SizedBox(height: 10,),
-                  Expanded(child:SingleChildScrollView(
-                    child:Text(
-                        answerResult.detail,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize:20)
-                    )
-                  ),),
-                  ElevatedButton(onPressed: () {
-                    if(!onceTap) return;
-                    onceTap = false;
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 300),
+                    padding: const EdgeInsets.only(
+                      top: padding+radius,
+                      bottom: padding,
+                      left: padding,
+                      right: padding,
+                    ),
+                    margin: const EdgeInsets.only(top:radius),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(padding),
+                      boxShadow: const [BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0,10)
+                      )]
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Text(
+                                answerResult.detail,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize:20,
+                                    color: Colors.black.withOpacity(0.75)
+                                )
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if(onceTap) return;
+                            onceTap = true;
 
-                    if(!nextQuestion()){
-                      repository.finishQuiz(args.quiz.id).then((QuizResult quizResult) async {
-                        Provider.of<QuizzesCubit>(context, listen: false).addScore(quizResult.score,args.quiz.id);
-                        await Navigator.pushNamed(context, "/quizFinished", arguments:QuizFinishedArguments(quizResult));
-                        Navigator.pop(context); // close modal
-                        Navigator.pop(parentContext); // close current screen
-                      }).onError((error, stackTrace){
-                        Navigator.pop(context); // close modal
-                        Navigator.pop(parentContext); // close current screen
-                      });
-                    }else{
-                      Navigator.pop(context);
-                    }
-                  }, child: const Text("Continuer"))
+                            if(!nextQuestion()){
+                              repository.finishQuiz(args.quiz.id).then((QuizResult quizResult) async {
+                                Provider.of<QuizzesCubit>(context, listen: false).addScore(quizResult.score,args.quiz.id);
+                                await Navigator.pushNamed(context, "/quizFinished", arguments:QuizFinishedArguments(quizResult));
+                                Navigator.pop(context); // close modal
+                                Navigator.pop(parentContext); // close current screen
+                              }).onError((error, stackTrace){
+                                Navigator.pop(context); // close modal
+                                Navigator.pop(parentContext); // close current screen
+                              });
+                            }else{
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: const [
+                              Text("Continuer"),
+                              Icon(Icons.navigate_next)
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    left: padding,
+                    right: padding,
+                    child: CircleAvatar(
+                      child: Icon(
+                        answerResult.correct?Icons.check:Icons.close,
+                        color: Colors.white,
+                        size: radius*2
+                      ),
+                      backgroundColor: answerResult.correct? Colors.green : Colors.red,
+                      radius: radius,
+                    ))
                 ],
               ),
-            ),
           );
         },
       );
@@ -152,7 +198,7 @@ class AnswerQuestion extends StatelessWidget {
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize:25,
-                        height: 1.4,
+                        height: 1.2,
                         color: Colors.black.withOpacity(0.75)
                       ),
                     ),
@@ -177,8 +223,8 @@ class AnswerQuestion extends StatelessWidget {
                     onPressed: () async {
                       if(!onceTap) return;
                         onceTap = false;
-                        //AnswerResult answerResult =  await repository.answerQuestion(args.quizId, question.id, true);
-                        //resultModal(context, answerResult);
+                        AnswerResult answerResult =  await repository.answerQuestion(args.quiz.id, question.id, true);
+                        resultModal(context, answerResult);
                       },
                     child: Row(
                       children: const [
@@ -202,8 +248,8 @@ class AnswerQuestion extends StatelessWidget {
                     if(!onceTap) return;
                     onceTap = false;
 
-                    //AnswerResult answerResult =  await repository.answerQuestion(args.quizId, question.id, false);
-                    //resultModal(context, answerResult);
+                    AnswerResult answerResult =  await repository.answerQuestion(args.quiz.id, question.id, false);
+                    resultModal(context, answerResult);
                   }, child: Row(
                       children: const [
                         Text(

@@ -28,10 +28,9 @@ class Home extends StatelessWidget {
         children: [
           BlocBuilder<QuizzesCubit, List<Quiz>>(
             builder: (context, quizzes) {
-
               bool onceTap = false;
-
               return GridView.builder(
+
                 cacheExtent: 10000,
                 padding: const EdgeInsets.all(10),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -44,7 +43,7 @@ class Home extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index){
 
                   final String label = quizzes[index].label;
-                  final lastScoreResult = (quizzes[index].scores.length > 0)?quizzes[index].scores.last.correct.toString()+"/"+quizzes[index].scores.last.total.toString():"";
+                  final lastScoreResult = (quizzes[index].score.total > 0)?quizzes[index].score.correct.toString()+"/"+quizzes[index].score.total.toString():"";
                   final imageUrl = apiHost+quizzes[index].imageLink;
 
                   return GridTile(
@@ -52,7 +51,6 @@ class Home extends StatelessWidget {
                       onTap: () {
                         if(onceTap) return;
                         onceTap = true;
-
                         FocusScope.of(context).unfocus();
                         repository.selectQuiz(quizzes[index].id).then((questions) {
                           Navigator.pushNamed(context, "/answerQuestion", arguments:AnswerQuestionArguments(quizzes[index],questions));

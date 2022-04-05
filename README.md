@@ -1,4 +1,4 @@
-# flutter_quiz_mds
+# flutter_quipoquiz
 
 ## specification
 

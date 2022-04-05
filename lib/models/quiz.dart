@@ -6,16 +6,16 @@ class Quiz{
   int id;
   String label;
   String imageLink;
-  List<Score> scores;
+  Score score;
 
-  Quiz(this.id, this.label, this.imageLink, this.scores);
+  Quiz(this.id, this.label, this.imageLink, this.score);
 
   String toJson(){
     return jsonEncode({
       'id' : id,
       'label': label,
       'imageLink': imageLink,
-      'scores': jsonEncode(scores)
+      'scores': score.toJson()
     });
   }
 
@@ -25,7 +25,7 @@ class Quiz{
       map['id'],
       map['label'],
       map['imageLink'],
-      Score.fromJsonList(map['scores']),
+      Score.fromJson(map['scores']),
     );
   }
 }

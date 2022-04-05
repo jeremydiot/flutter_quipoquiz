@@ -6,15 +6,19 @@ import 'package:flutter_quiz_mds/ui/screens/quiz_finished.dart';
 import 'package:flutter_quiz_mds/ui/screens/home.dart';
 import 'package:flutter_quiz_mds/ui/screens/answer_question.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   final Repository repository = Repository.factory();
-
   final QuizzesCubit quizzesCubit = QuizzesCubit(repository);
-
   final QuestionCubit questionCubit = QuestionCubit();
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   runApp(
     MultiProvider(
