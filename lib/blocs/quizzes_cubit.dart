@@ -34,7 +34,7 @@ class QuizzesCubit extends Cubit<List<Quiz>>{
 
   void addScore(Score score, int quizId){
     state.firstWhere((e) => e.id==quizId).score = score;
-    emit(state);
+    emit([...state]);
 
     _repository.loadQuizzes().then((quizzes){
       quizzes.firstWhere((e) => e.id==quizId).score = score;
