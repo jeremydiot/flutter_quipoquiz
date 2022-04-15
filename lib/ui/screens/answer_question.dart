@@ -53,89 +53,92 @@ class AnswerQuestion extends StatelessWidget {
           bool onceTap = false;
           const double padding = 15;
           const double radius = 30;
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            child: Stack(
-                children: [
-                  Container(
-                    constraints: const BoxConstraints(maxHeight: 400),
-                    padding: const EdgeInsets.only(
-                      top: padding+radius,
-                      bottom: padding,
-                      left: padding,
-                      right: padding,
-                    ),
-                    margin: const EdgeInsets.only(top:radius),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(padding),
-                      boxShadow: const [BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        offset: Offset(0,10)
-                      )]
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Center(
-                            child: SingleChildScrollView(
-                              child: Text(
-                                  answerResult.detail,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize:20,
-                                      color: Colors.black.withOpacity(0.75)
-                                  )
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              child: Stack(
+                  children: [
+                    Container(
+                      constraints: const BoxConstraints(maxHeight: 400),
+                      padding: const EdgeInsets.only(
+                        top: padding+radius,
+                        bottom: padding,
+                        left: padding,
+                        right: padding,
+                      ),
+                      margin: const EdgeInsets.only(top:radius),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(padding),
+                        boxShadow: const [BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0,10)
+                        )]
+                      ),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: SingleChildScrollView(
+                                child: Text(
+                                    answerResult.detail,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize:20,
+                                        color: Colors.black.withOpacity(0.75)
+                                    )
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            splashFactory: NoSplash.splashFactory,
-                          ),
-                          onPressed: () {
-                            if(onceTap) return;
-                            onceTap = true;
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              splashFactory: NoSplash.splashFactory,
+                            ),
+                            onPressed: () {
+                              if(onceTap) return;
+                              onceTap = true;
 
-                            if(!nextQuestion()){
-                              repository.finishQuiz(args.quiz.id).then((QuizResult quizResult) async {
-                                Provider.of<QuizzesCubit>(context, listen: false).addScore(quizResult.score,args.quiz.id);
-                                Navigator.pushNamed(context, "/quizFinished", arguments:QuizFinishedArguments(quizResult));
-                              }).onError((error, stackTrace){
-                                Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
-                              });
-                            }else{
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: const [
-                              Text("Continuer"),
-                              Icon(Icons.navigate_next)
-                            ],
+                              if(!nextQuestion()){
+                                repository.finishQuiz(args.quiz.id).then((QuizResult quizResult) async {
+                                  Provider.of<QuizzesCubit>(context, listen: false).addScore(quizResult.score,args.quiz.id);
+                                  Navigator.pushNamed(context, "/quizFinished", arguments:QuizFinishedArguments(quizResult));
+                                }).onError((error, stackTrace){
+                                  Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+                                });
+                              }else{
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: const [
+                                Text("Continuer"),
+                                Icon(Icons.navigate_next)
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    left: padding,
-                    right: padding,
-                    child: CircleAvatar(
-                      child: Icon(
-                        answerResult.correct?Icons.check:Icons.close,
-                        color: Colors.white,
-                        size: radius*2
+                        ],
                       ),
-                      backgroundColor: answerResult.correct? Colors.green : Colors.red,
-                      radius: radius,
-                    ))
-                ],
-              ),
+                    ),
+                    Positioned(
+                      left: padding,
+                      right: padding,
+                      child: CircleAvatar(
+                        child: Icon(
+                          answerResult.correct?Icons.check:Icons.close,
+                          color: Colors.white,
+                          size: radius*2
+                        ),
+                        backgroundColor: answerResult.correct? Colors.green : Colors.red,
+                        radius: radius,
+                      ))
+                  ],
+                ),
+            ),
           );
         },
       );
@@ -157,20 +160,31 @@ class AnswerQuestion extends StatelessWidget {
                     margin: const EdgeInsets.all(20),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image(
-                        image:CachedNetworkImageProvider(
-                            apiHost+question.image,
-                            errorListener: () => const Center(child: Icon(Icons.error, size: 50, color: Colors.red,))
+                      child: CachedNetworkImage(
+                        imageUrl:apiHost+question.image,
+                        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                        imageBuilder: (context, imageProvider) => Image(
+                          image: imageProvider,
+                          alignment: Alignment.center,
+                          fit: BoxFit.cover,
                         ),
-                        alignment: Alignment.center,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress){
-                          if (loadingProgress == null) return child;
-                          return const Center(child: CircularProgressIndicator());
-                        },
+
                       ),
-                    )
-                ),
+
+                    ),
+                      // child: Image(
+                      //   image:CachedNetworkImageProvider(
+                      //       apiHost+question.image,
+                      //       errorListener: () => const Center(child: Icon(Icons.error, size: 50, color: Colors.red,))
+                      //   ),
+                      //   alignment: Alignment.center,
+                      //   fit: BoxFit.cover,
+                      //   loadingBuilder: (context, child, loadingProgress){
+                      //     if (loadingProgress == null) return child;
+                      //     return const Center(child: CircularProgressIndicator());
+                      //   },
+                      // ),
+                  )
               ),
               Padding(
                 padding: const EdgeInsets.all(5.0),

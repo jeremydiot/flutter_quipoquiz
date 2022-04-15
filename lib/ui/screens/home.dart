@@ -64,25 +64,29 @@ class Home extends StatelessWidget {
                         alignment: Alignment.bottomRight,
                         children: [
                           Container(
-                            margin: const EdgeInsets.all(1),
-                            decoration: BoxDecoration(
-                              borderRadius:BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey),
-                            ),
-                            child: Center(
-                              child: Text(label,
-                                style: const TextStyle(fontSize: 25),
-                                textAlign: TextAlign.center,
-                              )
-                            )
-                          ),
-                          Container(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image(
-                                image: CachedNetworkImageProvider(imageUrl, errorListener: () => Center(child: Icon(Icons.error, size: 50, color: Colors.red.withOpacity(0.5)))),
-                                fit: BoxFit.fill
+                              child: CachedNetworkImage(
+                              imageUrl:imageUrl,
+                              errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red.withOpacity(0.7), size: 50,)),
+                              placeholder: (context, url) => Container(
+                                  margin: const EdgeInsets.all(1),
+                                  decoration: BoxDecoration(
+                                    borderRadius:BorderRadius.circular(10),
+                                    border: Border.all(color: Colors.grey),
+                                  ),
+                                  child: Center(
+                                      child: Text(label,
+                                        style: const TextStyle(fontSize: 25),
+                                        textAlign: TextAlign.center,
+                                      )
+                                  )
                               ),
+                              imageBuilder: (context, imageProvider) => Image(
+                                image: imageProvider,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),

@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="fr.jdiot.flutterquizmds.flutter_quiz_mds">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="QuipoQuiz"
         android:name="${applicationName}"
