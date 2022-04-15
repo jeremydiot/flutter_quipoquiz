@@ -36,8 +36,8 @@ class QuizFinished extends StatelessWidget {
           ),
           const SizedBox(height: 10,),
           TextButton(
-              onPressed: ()=> Navigator.pop(context),
-              child: Text("Continuer"),)
+              onPressed: ()=> Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false),
+              child: const Text("Continuer"))
         ],),
       ),
     );

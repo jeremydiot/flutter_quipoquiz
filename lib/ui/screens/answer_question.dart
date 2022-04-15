@@ -97,12 +97,9 @@ class AnswerQuestion extends StatelessWidget {
                             if(!nextQuestion()){
                               repository.finishQuiz(args.quiz.id).then((QuizResult quizResult) async {
                                 Provider.of<QuizzesCubit>(context, listen: false).addScore(quizResult.score,args.quiz.id);
-                                await Navigator.pushNamed(context, "/quizFinished", arguments:QuizFinishedArguments(quizResult));
-                                Navigator.pop(context); // close modal
-                                Navigator.pop(parentContext); // close current screen
+                                Navigator.pushNamed(context, "/quizFinished", arguments:QuizFinishedArguments(quizResult));
                               }).onError((error, stackTrace){
-                                Navigator.pop(context); // close modal
-                                Navigator.pop(parentContext); // close current screen
+                                Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
                               });
                             }else{
                               Navigator.pop(context);
