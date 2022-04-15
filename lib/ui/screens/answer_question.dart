@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quiz_mds/blocs/quizzes_cubit.dart';
@@ -10,6 +10,7 @@ import 'package:flutter_quiz_mds/models/quiz.dart';
 import 'package:flutter_quiz_mds/models/quiz_result.dart';
 import 'package:flutter_quiz_mds/repository/Repository.dart';
 import 'package:flutter_quiz_mds/ui/screens/quiz_finished.dart';
+import 'package:flutter_quiz_mds/ui/widgets/full_screen_loading.dart';
 import 'package:provider/provider.dart';
 
 class AnswerQuestionArguments{
@@ -42,8 +43,9 @@ class AnswerQuestion extends StatelessWidget {
     if(!nextQuestion()) Navigator.pop(context);
 
     // answer result modal
-    void resultModal(parentContext, AnswerResult answerResult){
+    void resultModal(BuildContext parentContext, AnswerResult answerResult){
       bool onceTap = true;
+      Navigator.pop(context);
       showDialog(
         barrierDismissible: false,
         context: parentContext,
@@ -56,7 +58,7 @@ class AnswerQuestion extends StatelessWidget {
             child: Stack(
                 children: [
                   Container(
-                    constraints: const BoxConstraints(maxHeight: 300),
+                    constraints: const BoxConstraints(maxHeight: 400),
                     padding: const EdgeInsets.only(
                       top: padding+radius,
                       bottom: padding,
@@ -75,21 +77,25 @@ class AnswerQuestion extends StatelessWidget {
                       )]
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Expanded(
-                          child: SingleChildScrollView(
-                            child: Text(
-                                answerResult.detail,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize:20,
-                                    color: Colors.black.withOpacity(0.75)
-                                )
+                          child: Center(
+                            child: SingleChildScrollView(
+                              child: Text(
+                                  answerResult.detail,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize:20,
+                                      color: Colors.black.withOpacity(0.75)
+                                  )
+                              ),
                             ),
                           ),
                         ),
                         TextButton(
+                          style: TextButton.styleFrom(
+                            splashFactory: NoSplash.splashFactory,
+                          ),
                           onPressed: () {
                             if(onceTap) return;
                             onceTap = true;
@@ -148,18 +154,20 @@ class AnswerQuestion extends StatelessWidget {
               AspectRatio(
                 aspectRatio: 1,
                 child: Container(
-                    margin: EdgeInsets.all(20),
+                    margin: const EdgeInsets.all(20),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        apiHost+question.image,
+                      child: Image(
+                        image:CachedNetworkImageProvider(
+                            apiHost+question.image,
+                            errorListener: () => const Center(child: Icon(Icons.error, size: 50, color: Colors.red,))
+                        ),
                         alignment: Alignment.center,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress){
                           if (loadingProgress == null) return child;
                           return const Center(child: CircularProgressIndicator());
                         },
-                        errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.error, size: 50, color: Colors.red,)),
                       ),
                     )
                 ),
@@ -180,13 +188,14 @@ class AnswerQuestion extends StatelessWidget {
                     ),
                     Text(
                       (questionTabNum+1).toString()+" / "+questions.length.toString(),
-                      style: const TextStyle(fontSize:25, color:  Colors.white),
+                      style: const TextStyle(fontSize:25, color:Colors.white),
                     ),
                   ],
                 ),
               ),
               Expanded(child:SingleChildScrollView(
-                padding: EdgeInsets.all(10),
+
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -199,7 +208,7 @@ class AnswerQuestion extends StatelessWidget {
                         color: Colors.black.withOpacity(0.75)
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       question.credit,
                       textAlign: TextAlign.right,
@@ -219,10 +228,11 @@ class AnswerQuestion extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () async {
                       if(!onceTap) return;
-                        onceTap = false;
-                        AnswerResult answerResult =  await repository.answerQuestion(args.quiz.id, question.id, true);
-                        resultModal(context, answerResult);
-                      },
+                      onceTap = false;
+                      fullScreenLoading(context);
+                      AnswerResult answerResult =  await repository.answerQuestion(args.quiz.id, question.id, true);
+                      resultModal(context, answerResult);
+                    },
                     child: Row(
                       children: const [
                         Text(
@@ -238,13 +248,13 @@ class AnswerQuestion extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(MediaQuery.of(context).size.width / 2, 80),
                       primary: Colors.green.withOpacity(0.8),
-                      shape: ContinuousRectangleBorder()
+                      shape: const ContinuousRectangleBorder()
                     ),
                   ),
                   ElevatedButton(onPressed: () async {
                     if(!onceTap) return;
                     onceTap = false;
-
+                    fullScreenLoading(context);
                     AnswerResult answerResult =  await repository.answerQuestion(args.quiz.id, question.id, false);
                     resultModal(context, answerResult);
                   }, child: Row(
@@ -262,7 +272,7 @@ class AnswerQuestion extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(MediaQuery.of(context).size.width / 2, 80),
                       primary: Colors.red.withOpacity(0.8),
-                      shape: ContinuousRectangleBorder()
+                      shape: const ContinuousRectangleBorder()
                     ),
                   )
                 ],)

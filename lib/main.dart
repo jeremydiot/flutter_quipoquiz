@@ -8,6 +8,14 @@ import 'package:flutter_quiz_mds/ui/screens/answer_question.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
+class AppScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
+}
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -38,7 +46,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'QuipoQuiz',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -51,6 +59,12 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
+      builder: (context, child){
+        return ScrollConfiguration(
+          behavior: AppScrollBehavior(),
+          child: child!,
+        );
+      },
       routes: {
         '/answerQuestion' : (context) => const AnswerQuestion(),
         '/quizFinished' : (context) => const QuizFinished(),

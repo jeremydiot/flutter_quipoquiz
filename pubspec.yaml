@@ -40,6 +40,7 @@ dependencies:
   shared_preferences: ^2.0.13
   http: ^0.13.4
   sprintf: ^6.0.0
+  cached_network_image: ^3.2.0
 
 dev_dependencies:
   flutter_test:
