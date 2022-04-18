@@ -162,28 +162,15 @@ class AnswerQuestion extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
                         imageUrl:apiHost+question.image,
+                        errorWidget: (context, url, error) => Center(child: Icon(Icons.error, color: Colors.red.withOpacity(0.7), size: 50,)),
                         placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
                         imageBuilder: (context, imageProvider) => Image(
                           image: imageProvider,
                           alignment: Alignment.center,
                           fit: BoxFit.cover,
                         ),
-
                       ),
-
                     ),
-                      // child: Image(
-                      //   image:CachedNetworkImageProvider(
-                      //       apiHost+question.image,
-                      //       errorListener: () => const Center(child: Icon(Icons.error, size: 50, color: Colors.red,))
-                      //   ),
-                      //   alignment: Alignment.center,
-                      //   fit: BoxFit.cover,
-                      //   loadingBuilder: (context, child, loadingProgress){
-                      //     if (loadingProgress == null) return child;
-                      //     return const Center(child: CircularProgressIndicator());
-                      //   },
-                      // ),
                   )
               ),
               Padding(
