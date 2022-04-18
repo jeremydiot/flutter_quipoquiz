@@ -7,7 +7,7 @@
 - Dart: 2.16.0
 
 ### Functionalities
-- Open from list
+- Open quiz from list
 - Search quiz
 - Store quiz result
 - Show last quiz result
@@ -23,23 +23,23 @@
 
 ### Screens
 - Home
-  - Result of last quiz (recycler view list)
-    - Quiz number
-    - Score
-    - click on open quiz => on result erase previous score
-
-  - button to start random quiz
-    - select quiz id, min: 1 max: 492
-    - open question
+  - all quizzes (recycler grid view) loaded form share preferences
+    - quiz image / label
+    - score
+    - on tap open view with quiz questions
+  - new score for an quiz erase previous score => saved in share preferences
+  - on tap all question loaded from API
 
 - Questions
-  - image
-  - text ( question or response result )
-  - buttons ( 2 response button (True, False) or next question button )
-  - After last response, redirect to finish quiz
+  - for each question
+    - image
+    - text question
+    - buttons, 2 response button (True, False) => send answer to API
+  - result of answer displayed on dialog element
+  - After last response, redirect to finish quiz view
 
 - Finish quiz
-  - register result
-  - result ( good response / answer number )
-  - stats
-  - buttons ( new quiz, quit to home )
+  - register result => in share preferences
+  - score ( good response / answer number )
+  - stats from API
+  - buttons return to home
